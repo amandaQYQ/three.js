@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <script src="js/three.js"></script>
+    <script src="js/WebGL.js"></script> <!-- 引入WebGL -->
+    <!-- <script id="vs" type="x-shader/x-vertex">
+        #version 300 es
+        
+        void main() {
+        
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        
+        }
+    </script>
+    <script id="fs" type="x-shader/x-fragment">
+        #version 300 es
+        
+        precision highp float;
+        precision highp int;
+        out vec4 out_FragColor;
+        
+        void main() {
+        
+            out_FragColor = vec4( 1.0 );
+        
+        }
+    </script> -->
+    <script>
+
+        // if (WEBGL.isWebGL2Available() === false) {
+        //     document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
+        // }
+        // var canvas = document.createElement('canvas');
+        // var context = canvas.getContext('webgl2');
+        // var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: context });
+
+        // var material = new THREE.ShaderMaterial({
+        //     vertexShader: document.getElementById('vs').textContent.trim(),
+        //     fragmentShader: document.getElementById('fs').textContent.trim()
+        // });
+
+
+
+        // 创建 renderer， scene， camera
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+        camera.position.set(0, 0, 100);
+        camera.lookAt(0, 0, 0);
+
+        var scene = new THREE.Scene();
+
+        // 创建材质
+        var material = new THREE.LineBasicMaterial({ color: 0x0000ff }); // 还有LineDashedMaterial
+
+        // vertice，绘制点
+        var geometry = new THREE.Geometry();   // 还可以用BufferGeometry，更专业
+        geometry.vertices.push(new THREE.Vector3(-10, 0, 0));  
+        geometry.vertices.push(new THREE.Vector3(0, 10, 0));
+        geometry.vertices.push(new THREE.Vector3(10, 0, 0));
+
+        // 把线和材质联系起来
+        var line = new THREE.Line( geometry, material );
+
+        // 把线添加到scene内，并渲染出来
+        scene.add(line);
+        renderer.render(scene, camera);
+    </script>
+</body>
+
+</html>
