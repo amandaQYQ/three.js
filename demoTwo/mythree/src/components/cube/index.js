@@ -1,6 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-import OrbitControls from 'three-orbitcontrols'
+// import OrbitControls from 'three-orbitcontrols';
 import './index.css';
 
 export default class Cube extends React.Component {
@@ -14,12 +14,9 @@ export default class Cube extends React.Component {
     }
     componentDidMount() {
         this.initRenderer();
-        this.setState({
-            update: true
-        })
+
     }
     componentDidUpdate() {
-        console.log(1)
         this.initRenderer();
     }
     // 初始化渲染
@@ -47,10 +44,10 @@ export default class Cube extends React.Component {
 
             // 使用报错：'OrbitControls' is not exported from 'three' (imported as 'THREE').
             // 解决：npm install three-orbit-controls
-            const controls = new OrbitControls(camera, canvas); // 自我理解： 允许相机围绕目标转
-              
-            controls.target.set(0, 5, 0);
-            controls.update();
+
+            // const controls = new OrbitControls(camera, canvas); // 自我理解： 允许相机围绕目标转      
+            // controls.target.set(0, 5, 0);
+            // controls.update();
         }
 
         let animate = () => {
