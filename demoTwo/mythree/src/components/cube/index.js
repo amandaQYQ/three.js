@@ -1,135 +1,120 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-// import OrbitControls from 'three-orbitcontrols';
-import './index.css';
 
-export default class Cube extends React.Component {
+/**立方体 */
+class Cube extends React.Component {
     constructor(props) {
         super(props);
         this.myRef = React.createRef();
-
-        this.state = {
-            addLight: true // 加灯光
-        }
+        this.draw = this.draw.bind(this);
     }
     componentDidMount() {
-        this.initRenderer();
-
+        this.draw();
     }
-    componentDidUpdate() {
-        this.initRenderer();
-    }
-    // 初始化渲染
-    initRenderer = () => {
-        let renderer = new THREE.WebGLRenderer({ canvas: this.myRef.current, antialias: true });
-        // renderer.setSize(500, 500); // 当不设置尺寸，而为了响应设置canvas宽高100%的时候，可能会拉伸图形
+    draw() {
+        // 渲染器
+        const renderer = new THREE.WebGLRenderer({
+            canvas: this.myRef.current
+        });
+        renderer.setSize(500, 500);
+        renderer.setClearColor(0x000000);
 
-        let cube = this.mesh();
-        let scene = this.setScene(cube);
-        let camera = this.setCamera();
+        // 相机
+        const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 1, 10);
+        camera.position.set(4, 4, 4);
+        camera.lookAt(0, 0, 0);
 
-        /* // 只解决拉伸：
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
-        */
+        // 场景
+        const scene = new THREE.Scene();
 
-        // 解决分辨率+拉伸：
-        if (this.resizeRendererToDisplaySize(renderer)) {
-            // 解决拉伸：
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
-
-
-            // 使用报错：'OrbitControls' is not exported from 'three' (imported as 'THREE').
-            // 解决：npm install three-orbit-controls
-
-            // const controls = new OrbitControls(camera, canvas); // 自我理解： 允许相机围绕目标转      
-            // controls.target.set(0, 5, 0);
-            // controls.update();
-        }
-
-        let animate = () => {
-            requestAnimationFrame(animate);
-
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            renderer.render(scene, camera);
-
-        };
-        // animate();
-        requestAnimationFrame(animate);
-    }
-    // 解决分辨率：
-    resizeRendererToDisplaySize = (renderer) => {
-        const canvas = renderer.domElement;
-        const width = canvas.clientWidth;
-        const height = canvas.clientHeight;
-        const needResize = canvas.width !== width || canvas.height !== height;
-        if (needResize) {
-            renderer.setSize(width, height, false); // 设置为false很重要
-
-            // .setSize(width : Integer, height : Integer, updateStyle : Boolean) : null
-            // 将输出canvas的大小调整为(width, height)并考虑设备像素比，且将视口从(0, 0)开始调整到适合大小 
-            // 将updateStyle设置为false以阻止对canvas的样式做任何改变。
-        }
-        return needResize;
-    }
-    // 创建camera相机
-    setCamera = () => {
-        let camera = new THREE.PerspectiveCamera(75, 1, 0.1, 500);
-        camera.position.set(0, 0, 2); // or camera.position.z = 2
-        camera.lookAt(0, 0, 0); // default
-        return camera;
-    }
-    // cube尺寸设置
-    setGeometry = () => {
-        let geometry = new THREE.BoxGeometry(1, 1, 1);
-        return geometry;
-    }
-    // cube材质设置
-    setMaterial = () => {
-        let material = null;
-        if (this.state.addLight) {
-            // 加灯光
-            material = new THREE.MeshPhongMaterial({ color: 0x44aa88 });
-        } else {
-            material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
-        }
-        // 
-
-        return material;
-    }
-    // 加个灯光特效
-    setLight = () => {
-        const light = new THREE.DirectionalLight(0xd65670, 1);
-        light.position.set(0, 0, 2);
-        return light;
-    }
-    // 创建cube=> (合并尺寸、材质)
-    mesh() {
-        let cube = new THREE.Mesh(this.setGeometry(), this.setMaterial());
-        return cube;
-    }
-    // 创建scene场景
-    setScene = (cube) => {
-        let scene = new THREE.Scene();
+        // 立方体
+        const cubeGeo = new THREE.CubeGeometry(1, 2, 3, 2, 2, 3);
+        const cubeMat = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            wireframe: true
+        })
+        const cube = new THREE.Mesh(cubeGeo, cubeMat);
         scene.add(cube);
 
-        // 加灯光
-        if (this.state.addLight) {
-            let light = this.setLight();
-            scene.add(light);
-        }
-
-        return scene;
+        renderer.render(scene, camera);
     }
     render() {
-        return (
-            <>
-                <canvas ref={this.myRef} style={{ display: 'block' }} id="aa" />
-            </>
-        )
+        return <canvas ref={this.myRef} style={{ display: 'block' }} />
     }
+}
+
+/**平面 */
+function Plane() {
+    const myref = useRef(null);
+    useEffect(() => {
+
+        // 渲染器
+        const renderer = new THREE.WebGLRenderer({
+            canvas: myref.current
+        });
+        renderer.setSize(500, 500);
+        renderer.setClearColor(0x000000);
+
+        // 相机
+        const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 1, 4);
+        camera.position.set(1.5, 1.5, 1.5);
+        camera.lookAt(0, 0, 0);
+
+        // 场景
+        const scene = new THREE.Scene();
+
+        // 坐标轴
+        axis(scene);
+
+        // 平面
+        const planeGeo = new THREE.PlaneGeometry(1, 2, 3, 3);
+        const planeMat = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            wireframe: true
+        })
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        scene.add(plane);
+
+        renderer.render(scene, camera);
+    })
+
+    // 绘制坐标轴
+    const axis = function (scene) {
+        // x-axis
+        var xGeo = new THREE.Geometry();
+        xGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        xGeo.vertices.push(new THREE.Vector3(2, 0, 0));
+        var xMat = new THREE.LineBasicMaterial({
+            color: 0xff0000
+        });
+        var xAxis = new THREE.Line(xGeo, xMat);
+        scene.add(xAxis);
+
+        // y-axis
+        var yGeo = new THREE.Geometry();
+        yGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        yGeo.vertices.push(new THREE.Vector3(0, 2, 0));
+        var yMat = new THREE.LineBasicMaterial({
+            color: 0x00ff00
+        });
+        var yAxis = new THREE.Line(yGeo, yMat);
+        scene.add(yAxis);
+
+        // z-axis
+        var zGeo = new THREE.Geometry();
+        zGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        zGeo.vertices.push(new THREE.Vector3(0, 0, 2));
+        var zMat = new THREE.LineBasicMaterial({
+            color: 0x00ccff
+        });
+        var zAxis = new THREE.Line(zGeo, zMat);
+        scene.add(zAxis);
+        console.log('aaaaa')
+    }
+    return <canvas ref={myref} />
+}
+
+export {
+    Cube,
+    Plane
 }
